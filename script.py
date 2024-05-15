@@ -117,11 +117,11 @@ def app(name, source_language, target_language):
     # dub_video = mix_video(VIDEO_SAVE_DIRECTORY + files[-1], name + "_mixed_audio.mp3", "./out/result/" + name + "_mixed.mp4")
     
     print("END")
-
-    ori_link = original_video.split('.')[1] if '.' in original_video else original_video
+    
+    # ori_link = original_video.split('.')[1] if '.' in original_video else original_video
 
     return {
-        "original_video": ori_link,
+        "original_video": original_video,
         "original_sub": subtitles["original"],
         "translated_sub": subtitles["translated"],
         # "dub_video": dub_video

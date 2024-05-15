@@ -4,6 +4,7 @@ from moviepy.editor import VideoFileClip
 from pytube import YouTube
 import os
 from spleeter.separator import Separator
+
 from VS.mt import translate_text
 
 def download(video_url, VIDEO_SAVE_DIRECTORY):
@@ -30,7 +31,7 @@ def download(video_url, VIDEO_SAVE_DIRECTORY):
     return path
     
     
-def extract_audio_from_video(video_path, audio_output_path, video_id):
+def extract_audio_from_video(video_path, audio_output_path, video_id, dubbing = False):
     # Load the video clip
     video_clip = VideoFileClip(video_path)
     
@@ -43,12 +44,14 @@ def extract_audio_from_video(video_path, audio_output_path, video_id):
     """
     Voice and noise separator
     """
-    separator = Separator('spleeter:2stems')
 
-    input_audio = audio_output_path
-    output_path = './sortie/'
+    if dubbing == True :
+        separator = Separator('spleeter:2stems')
 
-    separator.separate_to_file(input_audio, output_path)
+        input_audio = audio_output_path
+        output_path = './sortie/'
+
+        separator.separate_to_file(input_audio, output_path)
 
 def get_transcript(video_id, lgA, lgB):
     """Function to get video transcript
