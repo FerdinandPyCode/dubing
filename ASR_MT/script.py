@@ -1,10 +1,10 @@
 from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api.formatters import WebVTTFormatter
-
 from moviepy.editor import VideoFileClip
 from pytube import YouTube
 import os
 from spleeter.separator import Separator
+from VS.mt import translate_text
 
 def download(video_url, VIDEO_SAVE_DIRECTORY):
     """Downlaod youtube video by getting the id
@@ -75,10 +75,23 @@ def get_transcript(video_id, lgA, lgB):
       
     transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
 
-    print(transcript_list)
-    
+    # print(transcript_list)
+    print(transcript)
     transcript = transcript_list.find_transcript([lgA])
-    transcript = transcript.translate(lgB).fetch()
+    if lgB == 'fon':
+        index = 0
+        new_trans = transcript
+        for step in new_trans:
+            print(f'step trans fon {index} / {len(new_trans)}')
+            fon_trans = translate_text(step['text'])
+            transcript[index]['text'] = fon_trans
+            index += 1
+
+        print(new_trans)
+        print(transcript)
+        
+    else:
+        transcript = transcript.translate(lgB).fetch()
     
     subtitles["translated"] = formater(video_id, transcript, lgB, False)
     print(subtitles["translated"])

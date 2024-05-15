@@ -65,7 +65,7 @@ def mix_video(old_video, new_audio, new_video):
     
     return new_video
 
-def augmenter_silence(input_audio, output_audio, duree_augmentation_sec, project_name):
+def augmenter_silence(input_audio, output_audio, duree_augmentation_sec):
     # Charger le fichier audio existant
     audio_existant = AudioSegment.from_file(input_audio)
 
@@ -74,10 +74,6 @@ def augmenter_silence(input_audio, output_audio, duree_augmentation_sec, project
 
     # Concaténer le silence avec le fichier audio existant
     audio_augmente = silence_audio + audio_existant + silence_audio
-
-    if not os.path.exists(f"./{project_name}/up/"):
-        # Créer le dossier s'il n'existe pas
-        os.makedirs(f"./{project_name}/up/")
     
     # Sauvegarder le fichier audio augmenté
     audio_augmente.export(output_audio, format="mp3")
@@ -93,6 +89,18 @@ def text_to_speech(project_name, lgA, lgB):
         
         print("start speech ...")
         
+        tts = None
+        pipe = None
+        if(lgB == 'yo'):
+            # TTS YOR
+            device = "cuda" if torch.cuda.is_available() else "cpu"
+            tts = TTS("tts_models/yor/openbible/vits").to(device)
+            print("LOading tts_models OKAY")
+        elif (lgB == 'fon'):
+            pipe = pipeline("text-to-speech", model="facebook/mms-tts-fon")
+            print("Loading facebook/mms-tts-fon OKAY")
+        
+        # 
         for el in tab[2:]:
             
             print("---------->", i)
@@ -114,13 +122,9 @@ def text_to_speech(project_name, lgA, lgB):
                 # inference(el[:-1], file_path=str("./"+project_name+"/tts"+str(i)+".wav"))
                 if(lgB == 'yo'):
                     # TTS YOR
-                    device = "cuda" if torch.cuda.is_available() else "cpu"
-
-                    tts = TTS("tts_models/yor/openbible/vits").to(device)
                     text_to_speech_yor(tts,el[:-1],str("./"+project_name+"/tts"+str(i)+".wav"))
 
                 elif (lgB == 'fon'):
-                    pipe = pipeline("text-to-speech", model="facebook/mms-tts-fon")
                     text_to_speech_fon(pipe,el[:-1],str("./"+project_name+"/tts"+str(i)+".wav"))
                 else:
                     print("<---gTTS---->")
@@ -144,9 +148,15 @@ def text_to_speech(project_name, lgA, lgB):
                 
                 new_audio =  f"./{project_name}/up/tts{i}-up.mp3"
 
+                if not os.path.exists(f"./{project_name}/up/"):
+                    # Créer le dossier s'il n'existe pas
+                    os.makedirs(f"./{project_name}/up/")
+
+                ##
+
                 if coef < 1.001:
                     part_time_silence =  (time - duration) / 2
-                    augmenter_silence(path+"tts"+str(i)+".wav", new_audio, part_time_silence, project_name)  # 60 secondes d'augmentation
+                    augmenter_silence(path+"tts"+str(i)+".wav", new_audio, part_time_silence)  # 60 secondes d'augmentation
                 else:
                     # Augmenter la vitesse (coef=1.5 signifie coef=1.5 fois plus rapide)
                     audio_augmente = audio.speedup(playback_speed=coef)

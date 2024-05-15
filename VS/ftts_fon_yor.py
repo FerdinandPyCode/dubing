@@ -47,13 +47,40 @@ def text_to_speech_fon(model,text,output_file="fon.wav"):
 
 def text_to_speech_yor(model,text,output_file="yor.mp3"):
     # Get device (GPU or CPU)
-
-    # Init TTS
-
+    print("Init TTS")
     # Convert text to speech and save to a file
     model.tts_to_file(text=text, file_path=output_file)
     return output_file
 
+import requests
+
+def text_to_speech(output, lgA, lgB, text):
+    url = "https://7e93-137-255-17-161.ngrok-free.app/tts/yor"
+    payload = {"text": text}
+    headers = {"Content-Type": "application/json"}
+
+    response = requests.post(url, json=payload, headers=headers)
+
+    if response.status_code == 200:
+        result = response.json()
+        if "file_url" in result:
+            file_url = result["file_url"]
+            # Télécharger le fichier audio depuis l'URL
+            audio_response = requests.get(file_url)
+            if audio_response.status_code == 200:
+                # Enregistrer le fichier audio localement
+                with open(f"{project_name}-{lgB}.mp3", "wb") as audio_file:
+                    audio_file.write(audio_response.content)
+                print("Audio file created successfully!")
+            else:
+                print("Failed to download audio file:", audio_response.text)
+        else:
+            print("No file URL found in response:", result)
+    else:
+        print("Failed to request TTS API:", response.text)
+
+# Exemple d'utilisation
+# text_to_speech("project_name", "fr", "yor", "Bonjour, comment ça va?")
 
 
 # TTS FON
