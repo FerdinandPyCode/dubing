@@ -22,14 +22,17 @@ def download(video_url, VIDEO_SAVE_DIRECTORY):
     path = ""
     
     try:
-        path = video.download(VIDEO_SAVE_DIRECTORY)
+        print("PATH OF")
+        print(VIDEO_SAVE_DIRECTORY)
+        path = video.download(VIDEO_SAVE_DIRECTORY, filename = str(video_url + '.mp4'))
     except:
         print("Failed to download video")
 
     print("video was downloaded successfully")
-    
-    return path
-    
+    print(VIDEO_SAVE_DIRECTORY+video_url+'.mp4')
+    print("path", path)
+
+    return str(VIDEO_SAVE_DIRECTORY+video_url+'.mp4')
     
 def extract_audio_from_video(video_path, audio_output_path, video_id, dubbing = False):
     # Load the video clip
