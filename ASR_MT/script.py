@@ -79,21 +79,28 @@ def get_transcript(video_id, lgA, lgB):
     print(transcript)
     transcript = transcript_list.find_transcript([lgA])
     if lgB == 'fon':
-        index = 0
-        new_trans = transcript
-        for step in new_trans:
-            print(f'step trans fon {index} / {len(new_trans)}')
-            fon_trans = translate_text(step['text'])
-            transcript[index]['text'] = fon_trans
-            index += 1
 
-        print(new_trans)
-        print(transcript)
-        
+        tab = []
+        with open(video_id + ".vtt", "r") as fichier:
+            tab = fichier.readlines()
+
+        with open(video_id + "-" + lgB + ".vtt", "w") as fichier:
+            fichier.write("".join(tab[0:2]))
+            for el in tab[2:]:
+                if el != '\n' and '-->' not in el:
+                    translated_text1 = translate_text(lgA, lgB, el[:-1])
+                    fichier.write(translated_text1)
+                else:
+                    fichier.write(el)
+
+        # Formater les sous-titres traduits
+        subtitles["translated"] = video_id + "-" + lgB + ".vtt"
+        # print(new_trans)
+        print(subtitles["translated"])
     else:
         transcript = transcript.translate(lgB).fetch()
-    
-    subtitles["translated"] = formater(video_id, transcript, lgB, False)
+        subtitles["translated"] = formater(video_id, transcript, lgB, False)
+
     print(subtitles["translated"])
     return subtitles
 

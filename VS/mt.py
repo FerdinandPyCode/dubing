@@ -47,7 +47,7 @@ def translate_text(source, target, text):
 
         # Check if the translation was successful
         if 'translation' in response_data:
-            return response_data['translation']
+            return response_data['translation'] + '\n'
         else:
             return "Translation failed. Please check the input."
     else:
